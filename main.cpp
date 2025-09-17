@@ -57,6 +57,7 @@ void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo);
 void limpiarLienzo();
 void exportarImagen();
 
+
 void dibujarPixel(int x, int y)
 {
     glPointSize(grosorLinea);
@@ -167,7 +168,8 @@ void dibujarCirculoPuntoMedio(Punto centro, int radio)
     }
 }
 
-void dibujarElipsePuntoMedio(Punto centro, int rx, int ry) {
+void dibujarElipsePuntoMedio(Punto centro, int rx, int ry)
+{
     if (rx <= 0 || ry <= 0) return;
 
     int rx2 = rx * rx;
@@ -227,7 +229,8 @@ void dibujarElipsePuntoMedio(Punto centro, int rx, int ry) {
     }
 }
 
-void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo) {
+void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo)
+{
     if (puntos.size() < 2) return;
 
     switch (modo)
@@ -241,7 +244,8 @@ void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo) {
         case CIRCULO_PUNTO_MEDIO:
             if (puntos.size() == 2)
             {
-                int radio = static_cast<int>(sqrt(pow(puntos[1].x - puntos[0].x, 2) + pow(puntos[1].y - puntos[0].y, 2)));
+                int radio = static_cast<int>(sqrt(pow(puntos[1].x - puntos[0].x, 2) +
+                                                pow(puntos[1].y - puntos[0].y, 2)));
                 dibujarCirculoPuntoMedio(puntos[0], radio);
             }
             break;
@@ -310,5 +314,166 @@ void mostrar()
         glColor3f(colorActual.r, colorActual.g, colorActual.b);
         dibujarFigura(puntosActuales, modoActual);
     }
+
     glutSwapBuffers();
+}
+
+void raton(int boton, int estado, int x, int y)
+{
+    if (boton == GLUT_LEFT_BUTTON && estado == GLUT_DOWN)
+        {
+        int glX = x - anchoVentana/2;
+        int glY = altoVentana/2 - y;
+
+        if (mostrarCoordenadas)
+        {
+            cout << "Coordenadas: (" << glX << ", " << glY << ")" << endl;
+        }
+
+        if (modoActual != NINGUNO)
+        {
+            puntosActuales.push_back(Punto(glX, glY));
+
+            if ((modoActual == LINEA_DIRECTA || modoActual == LINEA_DDA) && puntosActuales.size() == 2)
+            {
+                figuras.push_back(puntosActuales);
+                coloresFiguras.push_back(colorActual);
+                grosoresFiguras.push_back(grosorLinea);
+                modosFiguras.push_back(modoActual);
+                puntosActuales.clear();
+            }
+            else if ((modoActual == CIRCULO_PUNTO_MEDIO || modoActual == ELIPSE_PUNTO_MEDIO) && puntosActuales.size() == 2)
+            {
+                figuras.push_back(puntosActuales);
+                coloresFiguras.push_back(colorActual);
+                grosoresFiguras.push_back(grosorLinea);
+                modosFiguras.push_back(modoActual);
+                puntosActuales.clear();
+            }
+        }
+
+        glutPostRedisplay();
+    }
+}
+
+void teclado(unsigned char tecla, int x, int y)
+{
+    switch (tecla)
+    {
+        case 'g': case 'G':
+            cuadriculaVisible = !cuadriculaVisible;
+            break;
+        case 'e': case 'E':
+            ejesVisibles = !ejesVisibles;
+            break;
+        case 'c': case 'C':
+            limpiarLienzo();
+            break;
+        case 's': case 'S':
+            exportarImagen();
+            break;
+        case 'z': case 'Z':
+            if (!figuras.empty())
+            {
+                figuras.pop_back();
+                coloresFiguras.pop_back();
+                grosoresFiguras.pop_back();
+                modosFiguras.pop_back();
+            }
+            break;
+        case 27:
+            exit(0);
+            break;
+    }
+    glutPostRedisplay();
+}
+
+void limpiarLienzo()
+{
+    figuras.clear();
+    coloresFiguras.clear();
+    grosoresFiguras.clear();
+    modosFiguras.clear();
+    puntosActuales.clear();
+    glutPostRedisplay();
+}
+
+void exportarImagen()
+{
+    ofstream archivo("exportado.ppm");
+    if (!archivo)
+    {
+        cerr << "Error al crear archivo" << endl;
+        return;
+    }
+
+    archivo << "P3\n" << anchoVentana << " " << altoVentana << "\n255\n";
+
+    for (int y = 0; y < altoVentana; y++)
+    {
+        for (int x = 0; x < anchoVentana; x++)
+        {
+            archivo << "255 255 255 ";
+        }
+        archivo << "\n";
+    }
+
+    archivo.close();
+    cout << "Imagen exportada como exportado.ppm" << endl;
+}
+
+void manejarMenu(int valor)
+{
+    switch (valor)
+    {
+        case 1: modoActual = LINEA_DIRECTA; break;
+        case 2: modoActual = LINEA_DDA; break;
+        case 3: modoActual = CIRCULO_PUNTO_MEDIO; break;
+        case 4: modoActual = ELIPSE_PUNTO_MEDIO; break;
+
+        case 10: colorActual = Color(0.0f, 0.0f, 0.0f); break;
+        case 11: colorActual = Color(1.0f, 0.0f, 0.0f); break;
+        case 12: colorActual = Color(0.0f, 1.0f, 0.0f); break;
+        case 13: colorActual = Color(0.0f, 0.0f, 1.0f); break;
+        case 14:
+
+            colorActual = Color(1.0f, 0.5f, 0.0f);
+            break;
+
+        case 20: grosorLinea = 1; break;
+        case 21: grosorLinea = 2; break;
+        case 22: grosorLinea = 3; break;
+        case 23: grosorLinea = 5; break;
+
+        case 30: cuadriculaVisible = !cuadriculaVisible; break;
+        case 31: ejesVisibles = !ejesVisibles; break;
+        case 32: mostrarCoordenadas = !mostrarCoordenadas; break;
+
+        case 40: limpiarLienzo(); break;
+        case 41:
+            if (!figuras.empty())
+            {
+                figuras.pop_back();
+                coloresFiguras.pop_back();
+                grosoresFiguras.pop_back();
+                modosFiguras.pop_back();
+            }
+            break;
+        case 42: exportarImagen(); break;
+
+        case 50:
+            cout << "Atajos de teclado:" << endl;
+            cout << "G - Mostrar/Ocultar cuadrícula" << endl;
+            cout << "E - Mostrar/Ocultar ejes" << endl;
+            cout << "C - Limpiar lienzo" << endl;
+            cout << "S - Exportar imagen" << endl;
+            cout << "Z - Deshacer última figura" << endl;
+            cout << "ESC - Salir" << endl;
+            break;
+        case 51:
+            cout << "CAD 2D Básico - FreeGLUT/OpenGL" << endl;
+            cout << "Implementa algoritmos clásicos de rasterización" << endl;
+            break;
+    }
+    glutPostRedisplay();
 }
