@@ -57,8 +57,7 @@ void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo);
 void limpiarLienzo();
 void exportarImagen();
 
-void dibujarPixel(int x, int y)
-{
+void dibujarPixel(int x, int y) {
     glPointSize(grosorLinea);
     glBegin(GL_POINTS);
     glVertex2i(x, y);
@@ -98,10 +97,70 @@ void dibujarLineaDirecta(Punto p1, Punto p2)
     {
         int inicioY = min(p1.y, p2.y);
         int finY = max(p1.y, p2.y);
-        for (int y = inicioY; y <= finY; y++) {
+        for (int y = inicioY; y <= finY; y++)
+        {
             int x = round((y - b) / m);
             dibujarPixel(x, y);
         }
     }
 }
 
+void dibujarLineaDDA(Punto p1, Punto p2)
+{
+    int dx = p2.x - p1.x;
+    int dy = p2.y - p1.y;
+    int pasos = max(abs(dx), abs(dy));
+
+    if (pasos == 0)
+    {
+        dibujarPixel(p1.x, p1.y);
+        return;
+    }
+
+    float incrementoX = (float)dx / pasos;
+    float incrementoY = (float)dy / pasos;
+
+    float x = p1.x;
+    float y = p1.y;
+
+    for (int i = 0; i <= pasos; i++)
+    {
+        dibujarPixel(round(x), round(y));
+        x += incrementoX;
+        y += incrementoY;
+    }
+
+void dibujarCirculoPuntoMedio(Punto centro, int radio)
+{
+    int x = 0;
+    int y = radio;
+    int d = 1 - radio;
+
+    auto dibujarPuntosCirculo = [&](int x, int y) {
+        dibujarPixel(centro.x + x, centro.y + y);
+        dibujarPixel(centro.x - x, centro.y + y);
+        dibujarPixel(centro.x + x, centro.y - y);
+        dibujarPixel(centro.x - x, centro.y - y);
+        dibujarPixel(centro.x + y, centro.y + x);
+        dibujarPixel(centro.x - y, centro.y + x);
+        dibujarPixel(centro.x + y, centro.y - x);
+        dibujarPixel(centro.x - y, centro.y - x);
+    };
+
+    dibujarPuntosCirculo(x, y);
+
+    while (y > x)
+    {
+        x++;
+        if (d < 0)
+        {
+            d += 2 * x + 1;
+        }
+        else
+        {
+            y--;
+            d += 2 * (x - y) + 1;
+        }
+        dibujarPuntosCirculo(x, y);
+    }
+}
