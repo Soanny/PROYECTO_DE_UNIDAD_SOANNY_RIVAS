@@ -56,3 +56,52 @@ void dibujarElipsePuntoMedio(Punto centro, int rx, int ry);
 void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo);
 void limpiarLienzo();
 void exportarImagen();
+
+void dibujarPixel(int x, int y)
+{
+    glPointSize(grosorLinea);
+    glBegin(GL_POINTS);
+    glVertex2i(x, y);
+    glEnd();
+}
+
+void dibujarLineaDirecta(Punto p1, Punto p2)
+{
+    int dx = p2.x - p1.x;
+    int dy = p2.y - p1.y;
+
+    if (dx == 0)
+    {
+        int inicioY = min(p1.y, p2.y);
+        int finY = max(p1.y, p2.y);
+        for (int y = inicioY; y <= finY; y++)
+        {
+            dibujarPixel(p1.x, y);
+        }
+        return;
+    }
+
+    float m = (float)dy / dx;
+    float b = p1.y - m * p1.x;
+
+    if (abs(m) <= 1.0f)
+    {
+        int inicioX = min(p1.x, p2.x);
+        int finX = max(p1.x, p2.x);
+        for (int x = inicioX; x <= finX; x++)
+        {
+            int y = round(m * x + b);
+            dibujarPixel(x, y);
+        }
+    }
+    else
+    {
+        int inicioY = min(p1.y, p2.y);
+        int finY = max(p1.y, p2.y);
+        for (int y = inicioY; y <= finY; y++) {
+            int x = round((y - b) / m);
+            dibujarPixel(x, y);
+        }
+    }
+}
+
