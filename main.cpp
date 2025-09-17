@@ -256,3 +256,59 @@ void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo) {
             break;
     }
 }
+
+void dibujarCuadricula()
+{
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glBegin(GL_LINES);
+
+    for (int x = -anchoVentana/2; x <= anchoVentana/2; x += espaciadoCuadricula)
+    {
+        glVertex2i(x, -altoVentana/2);
+        glVertex2i(x, altoVentana/2);
+    }
+
+    for (int y = -altoVentana/2; y <= altoVentana/2; y += espaciadoCuadricula)
+    {
+        glVertex2i(-anchoVentana/2, y);
+        glVertex2i(anchoVentana/2, y);
+    }
+
+    glEnd();
+}
+
+void dibujarEjes()
+{
+    glColor3f(0.5f, 0.5f, 0.5f);
+    glLineWidth(1.0f);
+    glBegin(GL_LINES);
+
+    glVertex2i(-anchoVentana/2, 0);
+    glVertex2i(anchoVentana/2, 0);
+
+    glVertex2i(0, -altoVentana/2);
+    glVertex2i(0, altoVentana/2);
+
+    glEnd();
+}
+
+void mostrar()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    if (cuadriculaVisible) dibujarCuadricula();
+    if (ejesVisibles) dibujarEjes();
+
+    for (size_t i = 0; i < figuras.size(); i++)
+    {
+        glColor3f(coloresFiguras[i].r, coloresFiguras[i].g, coloresFiguras[i].b);
+        dibujarFigura(figuras[i], modosFiguras[i]);
+    }
+
+    if (!puntosActuales.empty())
+    {
+        glColor3f(colorActual.r, colorActual.g, colorActual.b);
+        dibujarFigura(puntosActuales, modoActual);
+    }
+    glutSwapBuffers();
+}
