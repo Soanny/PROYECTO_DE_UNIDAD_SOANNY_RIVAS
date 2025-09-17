@@ -57,7 +57,8 @@ void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo);
 void limpiarLienzo();
 void exportarImagen();
 
-void dibujarPixel(int x, int y) {
+void dibujarPixel(int x, int y)
+{
     glPointSize(grosorLinea);
     glBegin(GL_POINTS);
     glVertex2i(x, y);
@@ -136,7 +137,8 @@ void dibujarCirculoPuntoMedio(Punto centro, int radio)
     int y = radio;
     int d = 1 - radio;
 
-    auto dibujarPuntosCirculo = [&](int x, int y) {
+    auto dibujarPuntosCirculo = [&](int x, int y)
+    {
         dibujarPixel(centro.x + x, centro.y + y);
         dibujarPixel(centro.x - x, centro.y + y);
         dibujarPixel(centro.x + x, centro.y - y);
@@ -162,5 +164,95 @@ void dibujarCirculoPuntoMedio(Punto centro, int radio)
             d += 2 * (x - y) + 1;
         }
         dibujarPuntosCirculo(x, y);
+    }
+}
+
+void dibujarElipsePuntoMedio(Punto centro, int rx, int ry) {
+    if (rx <= 0 || ry <= 0) return;
+
+    int rx2 = rx * rx;
+    int ry2 = ry * ry;
+    int dosRx2 = 2 * rx2;
+    int dosRy2 = 2 * ry2;
+
+    int x = 0;
+    int y = ry;
+    int px = 0;
+    int py = dosRx2 * y;
+
+    int d1 = ry2 - (rx2 * ry) + (rx2 / 4);
+
+    auto dibujarPuntosElipse = [&](int x, int y)
+    {
+        dibujarPixel(centro.x + x, centro.y + y);
+        dibujarPixel(centro.x - x, centro.y + y);
+        dibujarPixel(centro.x + x, centro.y - y);
+        dibujarPixel(centro.x - x, centro.y - y);
+    };
+
+    while (px < py)
+    {
+        dibujarPuntosElipse(x, y);
+        x++;
+        px += dosRy2;
+        if (d1 < 0)
+        {
+            d1 += ry2 + px;
+        }
+        else
+        {
+            y--;
+            py -= dosRx2;
+            d1 += ry2 + px - py;
+        }
+    }
+
+    int d2 = ry2 * (x + 0.5) * (x + 0.5) + rx2 * (y - 1) * (y - 1) - rx2 * ry2;
+
+    while (y >= 0)
+    {
+        dibujarPuntosElipse(x, y);
+        y--;
+        py -= dosRx2;
+        if (d2 > 0)
+        {
+            d2 += rx2 - py;
+        }
+        else
+        {
+            x++;
+            px += dosRy2;
+            d2 += rx2 - py + px;
+        }
+    }
+}
+
+void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo) {
+    if (puntos.size() < 2) return;
+
+    switch (modo)
+    {
+        case LINEA_DIRECTA:
+            dibujarLineaDirecta(puntos[0], puntos[1]);
+            break;
+        case LINEA_DDA:
+            dibujarLineaDDA(puntos[0], puntos[1]);
+            break;
+        case CIRCULO_PUNTO_MEDIO:
+            if (puntos.size() == 2)
+            {
+                int radio = static_cast<int>(sqrt(pow(puntos[1].x - puntos[0].x, 2) + pow(puntos[1].y - puntos[0].y, 2)));
+                dibujarCirculoPuntoMedio(puntos[0], radio);
+            }
+            break;
+        case ELIPSE_PUNTO_MEDIO:
+            if (puntos.size() == 2) {
+                int rx = abs(puntos[1].x - puntos[0].x);
+                int ry = abs(puntos[1].y - puntos[0].y);
+                dibujarElipsePuntoMedio(puntos[0], rx, ry);
+            }
+            break;
+        default:
+            break;
     }
 }
