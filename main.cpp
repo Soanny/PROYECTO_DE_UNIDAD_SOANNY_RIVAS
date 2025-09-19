@@ -477,3 +477,49 @@ void manejarMenu(int valor)
     }
     glutPostRedisplay();
 }
+
+void crearMenu() {
+    int menuDibujo = glutCreateMenu(manejarMenu);
+    glutAddMenuEntry("Recta (Método Directo)", 1);
+    glutAddMenuEntry("Recta (DDA/ADD)", 2);
+    glutAddMenuEntry("Círculo (Punto Medio)", 3);
+    glutAddMenuEntry("Elipse (Punto Medio)", 4);
+
+    int menuColor = glutCreateMenu(manejarMenu);
+    glutAddMenuEntry("Negro", 10);
+    glutAddMenuEntry("Rojo", 11);
+    glutAddMenuEntry("Verde", 12);
+    glutAddMenuEntry("Azul", 13);
+    glutAddMenuEntry("Personalizado", 14);
+
+    int menuGrosor = glutCreateMenu(manejarMenu);
+    glutAddMenuEntry("1 px", 20);
+    glutAddMenuEntry("2 px", 21);
+    glutAddMenuEntry("3 px", 22);
+    glutAddMenuEntry("5 px", 23);
+
+    int menuVista = glutCreateMenu(manejarMenu);
+    glutAddMenuEntry("Mostrar/Ocultar cuadrícula", 30);
+    glutAddMenuEntry("Mostrar/Ocultar ejes", 31);
+    glutAddMenuEntry("Coordenadas del puntero", 32);
+
+    int menuHerramientas = glutCreateMenu(manejarMenu);
+    glutAddMenuEntry("Limpiar lienzo", 40);
+    glutAddMenuEntry("Borrar última figura", 41);
+    glutAddMenuEntry("Exportar imagen", 42);
+
+    int menuAyuda = glutCreateMenu(manejarMenu);
+    glutAddMenuEntry("Atajos de teclado", 50);
+    glutAddMenuEntry("Acerca de", 51);
+
+    int menuPrincipal = glutCreateMenu(manejarMenu);
+    glutAddSubMenu("Dibujo", menuDibujo);
+    glutAddSubMenu("Color", menuColor);
+    glutAddSubMenu("Grosor", menuGrosor);
+    glutAddSubMenu("Vista", menuVista);
+    glutAddSubMenu("Herramientas", menuHerramientas);
+    glutAddSubMenu("Ayuda", menuAyuda);
+
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
