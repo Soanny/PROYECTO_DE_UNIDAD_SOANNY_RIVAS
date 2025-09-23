@@ -57,7 +57,6 @@ void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo);
 void limpiarLienzo();
 void exportarImagen();
 
-
 void dibujarPixel(int x, int y)
 {
     glPointSize(grosorLinea);
@@ -70,7 +69,6 @@ void dibujarLineaDirecta(Punto p1, Punto p2)
 {
     int dx = p2.x - p1.x;
     int dy = p2.y - p1.y;
-
     if (dx == 0)
     {
         int inicioY = min(p1.y, p2.y);
@@ -107,8 +105,7 @@ void dibujarLineaDirecta(Punto p1, Punto p2)
     }
 }
 
-void dibujarLineaDDA(Punto p1, Punto p2)
-{
+void dibujarLineaDDA(Punto p1, Punto p2) {
     int dx = p2.x - p1.x;
     int dy = p2.y - p1.y;
     int pasos = max(abs(dx), abs(dy));
@@ -131,6 +128,7 @@ void dibujarLineaDDA(Punto p1, Punto p2)
         x += incrementoX;
         y += incrementoY;
     }
+}
 
 void dibujarCirculoPuntoMedio(Punto centro, int radio)
 {
@@ -250,7 +248,8 @@ void dibujarFigura(const vector<Punto>& puntos, ModoDibujo modo)
             }
             break;
         case ELIPSE_PUNTO_MEDIO:
-            if (puntos.size() == 2) {
+            if (puntos.size() == 2)
+            {
                 int rx = abs(puntos[1].x - puntos[0].x);
                 int ry = abs(puntos[1].y - puntos[0].y);
                 dibujarElipsePuntoMedio(puntos[0], rx, ry);
@@ -330,8 +329,7 @@ void raton(int boton, int estado, int x, int y)
             cout << "Coordenadas: (" << glX << ", " << glY << ")" << endl;
         }
 
-        if (modoActual != NINGUNO)
-        {
+        if (modoActual != NINGUNO) {
             puntosActuales.push_back(Punto(glX, glY));
 
             if ((modoActual == LINEA_DIRECTA || modoActual == LINEA_DDA) && puntosActuales.size() == 2)
@@ -401,8 +399,7 @@ void limpiarLienzo()
 void exportarImagen()
 {
     ofstream archivo("exportado.ppm");
-    if (!archivo)
-    {
+    if (!archivo) {
         cerr << "Error al crear archivo" << endl;
         return;
     }
@@ -431,13 +428,13 @@ void manejarMenu(int valor)
         case 3: modoActual = CIRCULO_PUNTO_MEDIO; break;
         case 4: modoActual = ELIPSE_PUNTO_MEDIO; break;
 
-        case 10: colorActual = Color(0.0f, 0.0f, 0.0f); break;
-        case 11: colorActual = Color(1.0f, 0.0f, 0.0f); break;
-        case 12: colorActual = Color(0.0f, 1.0f, 0.0f); break;
-        case 13: colorActual = Color(0.0f, 0.0f, 1.0f); break;
+        case 10: colorActual = Color(0.0f, 0.0f, 0.0f); break; // Negro
+        case 11: colorActual = Color(1.0f, 0.0f, 0.0f); break; // Rojo
+        case 12: colorActual = Color(0.0f, 1.0f, 0.0f); break; // Verde
+        case 13: colorActual = Color(0.0f, 0.0f, 1.0f); break; // Azul
         case 14:
-
-            colorActual = Color(1.0f, 0.5f, 0.0f);
+            // Personalizado
+            colorActual = Color(1.0f, 0.5f, 0.0f); // Naranja
             break;
 
         case 20: grosorLinea = 1; break;
@@ -449,6 +446,7 @@ void manejarMenu(int valor)
         case 31: ejesVisibles = !ejesVisibles; break;
         case 32: mostrarCoordenadas = !mostrarCoordenadas; break;
 
+        // Herramientas
         case 40: limpiarLienzo(); break;
         case 41:
             if (!figuras.empty())
@@ -461,6 +459,7 @@ void manejarMenu(int valor)
             break;
         case 42: exportarImagen(); break;
 
+        // Ayuda
         case 50:
             cout << "Atajos de teclado:" << endl;
             cout << "G - Mostrar/Ocultar cuadrícula" << endl;
@@ -478,7 +477,8 @@ void manejarMenu(int valor)
     glutPostRedisplay();
 }
 
-void crearMenu() {
+void crearMenu()
+{
     int menuDibujo = glutCreateMenu(manejarMenu);
     glutAddMenuEntry("Recta (Método Directo)", 1);
     glutAddMenuEntry("Recta (DDA/ADD)", 2);
@@ -521,5 +521,50 @@ void crearMenu() {
     glutAddSubMenu("Ayuda", menuAyuda);
 
     glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void inicializar()
+{
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-anchoVentana/2, anchoVentana/2, -altoVentana/2, altoVentana/2);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void redimensionar(int w, int h)
+{
+    anchoVentana = w;
+    altoVentana = h;
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(-w/2, w/2, -h/2, h/2);
+    glMatrixMode(GL_MODELVIEW);
+    glutPostRedisplay();
+}
+
+int main(int argc, char** argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(anchoVentana, altoVentana);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("CAD 2D Básico - FreeGLUT/OpenGL");
+
+    inicializar();
+    crearMenu();
+
+    glutDisplayFunc(mostrar);
+    glutReshapeFunc(redimensionar);
+    glutMouseFunc(raton);
+    glutKeyboardFunc(teclado);
+
+    cout << "CAD 2D Básico iniciado" << endl;
+    cout << "Click derecho para abrir el menú" << endl;
+    cout << "Presiona 'H' para ver atajos de teclado" << endl;
+
+    glutMainLoop();
+    return 0;
 }
 
