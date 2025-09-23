@@ -105,7 +105,8 @@ void dibujarLineaDirecta(Punto p1, Punto p2)
     }
 }
 
-void dibujarLineaDDA(Punto p1, Punto p2) {
+void dibujarLineaDDA(Punto p1, Punto p2)
+{
     int dx = p2.x - p1.x;
     int dy = p2.y - p1.y;
     int pasos = max(abs(dx), abs(dy));
@@ -462,16 +463,16 @@ void manejarMenu(int valor)
         // Ayuda
         case 50:
             cout << "Atajos de teclado:" << endl;
-            cout << "G - Mostrar/Ocultar cuadrícula" << endl;
+            cout << "G - Mostrar/Ocultar cuadricula" << endl;
             cout << "E - Mostrar/Ocultar ejes" << endl;
             cout << "C - Limpiar lienzo" << endl;
             cout << "S - Exportar imagen" << endl;
-            cout << "Z - Deshacer última figura" << endl;
+            cout << "Z - Deshacer ultima figura" << endl;
             cout << "ESC - Salir" << endl;
             break;
         case 51:
-            cout << "CAD 2D Básico - FreeGLUT/OpenGL" << endl;
-            cout << "Implementa algoritmos clásicos de rasterización" << endl;
+            cout << "CAD 2D Basico - FreeGLUT/OpenGL" << endl;
+            cout << "Implementa algoritmos clasicos de rasterizacion" << endl;
             break;
     }
     glutPostRedisplay();
@@ -480,7 +481,7 @@ void manejarMenu(int valor)
 void crearMenu()
 {
     int menuDibujo = glutCreateMenu(manejarMenu);
-    glutAddMenuEntry("Recta (Método Directo)", 1);
+    glutAddMenuEntry("Recta (Metodo Directo)", 1);
     glutAddMenuEntry("Recta (DDA/ADD)", 2);
     glutAddMenuEntry("Círculo (Punto Medio)", 3);
     glutAddMenuEntry("Elipse (Punto Medio)", 4);
@@ -499,13 +500,13 @@ void crearMenu()
     glutAddMenuEntry("5 px", 23);
 
     int menuVista = glutCreateMenu(manejarMenu);
-    glutAddMenuEntry("Mostrar/Ocultar cuadrícula", 30);
+    glutAddMenuEntry("Mostrar/Ocultar cuadricula", 30);
     glutAddMenuEntry("Mostrar/Ocultar ejes", 31);
     glutAddMenuEntry("Coordenadas del puntero", 32);
 
     int menuHerramientas = glutCreateMenu(manejarMenu);
     glutAddMenuEntry("Limpiar lienzo", 40);
-    glutAddMenuEntry("Borrar última figura", 41);
+    glutAddMenuEntry("Borrar ultima figura", 41);
     glutAddMenuEntry("Exportar imagen", 42);
 
     int menuAyuda = glutCreateMenu(manejarMenu);
